@@ -38,8 +38,8 @@ class FatalError(Exception):
   pass
 
 
-def exit_with_error(*args):
-  logging.error(*args)
+def exit_with_error(msg, *args):
+  logging.error(msg, *args)
   sys.exit(1)
 
 
@@ -926,7 +926,6 @@ class Configuration(object):
 def apply_configuration():
   global configuration, DEBUG, EMSCRIPTEN_TEMP_DIR, DEBUG_CACHE, CANONICAL_TEMP_DIR, TEMP_DIR
   configuration = Configuration()
-  DEBUG = configuration.DEBUG
   EMSCRIPTEN_TEMP_DIR = configuration.EMSCRIPTEN_TEMP_DIR
   DEBUG_CACHE = configuration.DEBUG_CACHE
   CANONICAL_TEMP_DIR = configuration.CANONICAL_TEMP_DIR
@@ -1342,6 +1341,9 @@ def verify_settings():
 
     if Settings.EMTERPRETIFY:
       exit_with_error('emcc: EMTERPRETIFY is not is not supported by the LLVM wasm backend')
+
+    if Settings.SIDE_MODULE or Settings.MAIN_MODULE:
+      exit_with_error('emcc: MAIN_MODULE and SIDE_MODULE are not yet supported by the LLVM wasm backend')
 
 
 Settings = SettingsManager()
@@ -1946,12 +1948,7 @@ class Building(object):
         cmd += ['--export', export[1:]] # Strip the leading underscore
 
     logging.debug('emcc: lld-linking: %s to %s', files, target)
-    t = time.time()
     check_call(cmd)
-    if DEBUG:
-      logging.debug('  emscript: lld took %s seconds' % (time.time() - t))
-      t = time.time()
-
     return target
 
   @staticmethod
