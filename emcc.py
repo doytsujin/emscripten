@@ -2557,12 +2557,11 @@ def do_binaryen(target, asm_target, options, memfile, wasm_binary_target,
     shared.Building.eval_ctors(final, wasm_binary_target, binaryen_bin, debug_info=debug_info)
   # after generating the wasm, do some final operations
   if shared.Settings.SIDE_MODULE:
-    if not shared.Settings.WASM_BACKEND:
-      wso = shared.WebAssembly.make_shared_library(final, wasm_binary_target)
-      # replace the wasm binary output with the dynamic library. TODO: use a specific suffix for such files?
-      shutil.move(wso, wasm_binary_target)
-      if not DEBUG:
-        os.unlink(asm_target) # we don't need the asm.js, it can just confuse
+    wso = shared.WebAssembly.make_shared_library(final, wasm_binary_target)
+    # replace the wasm binary output with the dynamic library. TODO: use a specific suffix for such files?
+    shutil.move(wso, wasm_binary_target)
+    if not shared.Settings.WASM_BACKEND and not DEBUG:
+      os.unlink(asm_target) # we don't need the asm.js, it can just confuse
     sys.exit(0) # and we are done.
   if options.opt_level >= 2:
     # minify the JS
