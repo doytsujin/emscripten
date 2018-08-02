@@ -15,7 +15,6 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import time
 
 from .toolchain_profiler import ToolchainProfiler
 from .tempfiles import try_delete
@@ -1340,7 +1339,7 @@ def verify_settings():
       exit_with_error('emcc: CYBERDWARF is not supported by the LLVM wasm backend')
 
     if Settings.EMTERPRETIFY:
-      exit_with_error('emcc: EMTERPRETIFY is not is not supported by the LLVM wasm backend')
+      exit_with_error('emcc: EMTERPRETIFY is not supported by the LLVM wasm backend')
 
     if Settings.SIDE_MODULE or Settings.MAIN_MODULE:
       exit_with_error('emcc: MAIN_MODULE and SIDE_MODULE are not yet supported by the LLVM wasm backend')

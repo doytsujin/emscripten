@@ -837,7 +837,7 @@ f.close()
       out, err = Popen([PYTHON, EMCC, 'src.c'] + args, stderr=PIPE).communicate()
       self.assertContained(expected, run_js(self.in_dir('a.out.js'), stderr=PIPE, full_output=True, assert_returncode=None))
       print('in asm.js')
-      if is_wasm_backend():
+      if self.is_wasm_backend():
         return
       out, err = Popen([PYTHON, EMCC, 'src.c', '-s', 'WASM=0'] + args, stderr=PIPE).communicate()
       self.assertContained(expected, run_js(self.in_dir('a.out.js'), stderr=PIPE, full_output=True, assert_returncode=None))
@@ -7993,9 +7993,7 @@ int main() {
           cmd = [PYTHON, EMCC, path_from_root('tests', 'hello_world.cpp'), '-s', 'WASM=1'] + args
           print(' '.join(cmd))
           err = run_process(cmd, stdout=PIPE, stderr=PIPE).stderr
-          if self.is_wasm_backend():
-            pass
-          else:
+          if not self.is_wasm_backend():
             asm2wasm_line = [x for x in err.split('\n') if 'asm2wasm' in x][0]
             asm2wasm_line = asm2wasm_line.strip() + ' ' # ensure it ends with a space, for simpler searches below
             print('|' + asm2wasm_line + '|')
@@ -8244,8 +8242,7 @@ int main() {
       # specified target
       print('building: ' + target)
       self.clear()
-      cmd = [PYTHON, EMCC, path_from_root('tests', 'hello_world.cpp'), '-s', 'WASM=1', '-s', 'SIDE_MODULE=1'] + opts
-      run_process(cmd)
+      run_process([PYTHON, EMCC, path_from_root('tests', 'hello_world.cpp'), '-s', 'WASM=1', '-s', 'SIDE_MODULE=1'] + opts)
       for x in os.listdir('.'):
         assert not x.endswith('.js'), 'we should not emit js when making a wasm side module: ' + x
       self.assertIn(b'dylink', open(target, 'rb').read())
